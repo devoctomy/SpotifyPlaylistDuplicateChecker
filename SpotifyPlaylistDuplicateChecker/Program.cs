@@ -2,12 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 namespace SpotifyPlaylistDuplicateChecker
 {
     class Program
     {
+        private static bool _includePrivate = true; // Requires playlist-read-private scope
+        private static bool _onlyMyPlaylists = true;
+
         static async Task<int> Main(string[] args)
         {
             //Get your access token using the Spotify developer hub
@@ -20,6 +24,7 @@ namespace SpotifyPlaylistDuplicateChecker
             if(!string.IsNullOrEmpty(spotifyAccessToken))
             {
                 var spotify = new SpotifyClient(spotifyAccessToken);
+                var user = await spotify.UserProfile.Current();
 
                 Console.WriteLine("Getting user playlists.");
                 var allPlaylists = await spotify.Playlists.CurrentUsers();
@@ -30,6 +35,16 @@ namespace SpotifyPlaylistDuplicateChecker
                 foreach (var curPlaylist in allPlaylists.Items)
                 {
                     var playlist = await spotify.Playlists.Get(curPlaylist.Id);
+                    if(!playlist.Public.GetValueOrDefault() && !_includePrivate)
+                    {
+                        continue;
+                    }
+
+                    if(playlist.Owner.Id != user.Id && _onlyMyPlaylists)
+                    {
+                        continue;
+                    }
+
                     Console.WriteLine($"Checking playlist {playlist.Name}.");
                     foreach (var curTrack in playlist.Tracks.Items)
                     {
@@ -47,9 +62,7 @@ namespace SpotifyPlaylistDuplicateChecker
                             }
                         }
 
-                        var id = fullTrack.Id;
                         var displayName = string.Join(',', fullTrack.Artists.Select(x => x.Name).ToArray()) + " - " + fullTrack.Name;
-
                         var foundIn = new List<string>();
                         if(allDuplicates.ContainsKey(displayName))
                         {

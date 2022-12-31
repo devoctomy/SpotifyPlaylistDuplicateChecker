@@ -86,7 +86,7 @@ namespace SpotifyPlaylistDuplicateChecker
                 {
                     foreach (var curDuplicate in duplicates)
                     {
-                        Console.WriteLine($"'{curDuplicate.Key}' found '{string.Join(',', curDuplicate.Value)}'");
+                        Console.WriteLine($"({curDuplicate.Value.Count}) '{curDuplicate.Key}' found '{string.Join(',', curDuplicate.Value)}'");
                     }
                 }
                 else

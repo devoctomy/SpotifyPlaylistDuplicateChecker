@@ -27,12 +27,13 @@ namespace SpotifyPlaylistDuplicateChecker
                 var user = await spotify.UserProfile.Current();
 
                 Console.WriteLine("Getting user playlists.");
-                var allPlaylists = await spotify.Playlists.CurrentUsers();
+                var playlistsFirstPage = await spotify.Playlists.CurrentUsers();
+                var allPlaylists = await spotify.PaginateAll(playlistsFirstPage);
 
                 Console.WriteLine("Checking for duplicates.");
                 var allDuplicates = new Dictionary<string, List<string>>();
                 var artistCount = new Dictionary<string, int>();
-                foreach (var curPlaylist in allPlaylists.Items)
+                foreach (var curPlaylist in allPlaylists)
                 {
                     var playlist = await spotify.Playlists.Get(curPlaylist.Id);
                     if(!playlist.Public.GetValueOrDefault() && !_includePrivate)

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SpotifyAPI.Web" Version="6.2.2" />
+    <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
 
